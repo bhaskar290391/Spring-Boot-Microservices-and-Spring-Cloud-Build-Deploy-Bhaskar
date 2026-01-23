@@ -47,9 +47,19 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
-			<version>4.0.2</version>
 			<scope>compile</scope>
 		</dependency>
+
+
+		<!-- Source:
+		https://mvnrepository.com/artifact/tools.jackson.dataformat/jackson-dataformat-xml -->
+		<dependency>
+			<groupId>tools.jackson.dataformat</groupId>
+			<artifactId>jackson-dataformat-xml</artifactId>
+			<scope>compile</scope>
+		</dependency>
+		
+		
 	</dependencies>
 
 	<build>
