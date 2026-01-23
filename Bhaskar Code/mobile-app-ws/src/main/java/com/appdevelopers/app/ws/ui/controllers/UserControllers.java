@@ -8,10 +8,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.appdevelopers.app.ws.ui.models.request.UserDetailsRequest;
 import com.appdevelopers.app.ws.ui.models.response.UserRest;
 
 @RestController
@@ -31,9 +33,16 @@ public class UserControllers {
 		return new ResponseEntity<UserRest>(returnValue, HttpStatus.ACCEPTED);
 	}
 
-	@PostMapping
-	public String createUsers() {
-		return "Create user was called";
+	@PostMapping(produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE }, consumes  = {
+			MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
+	public ResponseEntity<UserRest> createUsers(@RequestBody UserDetailsRequest userDeatils) {
+		
+		UserRest data=new UserRest();
+		data.setFirstName(userDeatils.getFirstName());
+		data.setLastName(userDeatils.getLastName());
+		data.setEmail(userDeatils.getEmail());
+		
+		return new ResponseEntity<UserRest>(data, HttpStatus.OK);
 	}
 
 	@PutMapping
