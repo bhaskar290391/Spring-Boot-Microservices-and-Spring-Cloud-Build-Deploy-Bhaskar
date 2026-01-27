@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.appdevelopers.app.ws.ui.models.request.UpdateUserDetailsRequest;
 import com.appdevelopers.app.ws.ui.models.request.UserDetailsRequest;
 import com.appdevelopers.app.ws.ui.models.response.UserRest;
 
@@ -27,7 +28,7 @@ import jakarta.validation.Valid;
 @RequestMapping("users")
 public class UserControllers {
 
-	Map<String, Object> usersData;
+	private Map<String, UserRest> usersData;
 
 	@GetMapping
 	public String getUsers(@RequestParam(value = "page", required = false, defaultValue = "1") int page,
@@ -38,10 +39,10 @@ public class UserControllers {
 
 	@GetMapping(path = "/{userId}", produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
 	public ResponseEntity<UserRest> getUsersById(@PathVariable String userId) {
-		
-		if(usersData.containsKey(userId)) {
-			return new ResponseEntity<UserRest>((@Nullable UserRest) usersData.get(userId), HttpStatus.OK);
-		}else {
+
+		if (usersData.containsKey(userId)) {
+			return new ResponseEntity<UserRest>(usersData.get(userId), HttpStatus.OK);
+		} else {
 			return new ResponseEntity<UserRest>(HttpStatus.NO_CONTENT);
 		}
 	}
@@ -66,9 +67,20 @@ public class UserControllers {
 		return new ResponseEntity<UserRest>(data, HttpStatus.CREATED);
 	}
 
-	@PutMapping
-	public String updateUsers() {
-		return "Update user was called";
+	@PutMapping(path = "/{userId}", produces = { MediaType.APPLICATION_JSON_VALUE,
+			MediaType.APPLICATION_XML_VALUE }, consumes = { MediaType.APPLICATION_JSON_VALUE,
+					MediaType.APPLICATION_XML_VALUE })
+	public ResponseEntity<UserRest> updateUsers(@PathVariable String userId,
+			@Valid @RequestBody UpdateUserDetailsRequest userDeatils) {
+
+		UserRest userRest = usersData.get(userId);
+
+		userRest.setFirstName(userDeatils.getFirstName());
+		userRest.setLastName(userDeatils.getLastName());
+
+		usersData.put(userId, userRest);
+
+		return new ResponseEntity<UserRest>(userRest, HttpStatus.OK);
 	}
 
 	@DeleteMapping
