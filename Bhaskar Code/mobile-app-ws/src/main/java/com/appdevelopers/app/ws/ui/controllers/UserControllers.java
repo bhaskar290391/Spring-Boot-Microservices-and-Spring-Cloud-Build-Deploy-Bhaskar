@@ -3,6 +3,7 @@ package com.appdevelopers.app.ws.ui.controllers;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,6 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.appdevelopers.app.ws.ui.models.request.UserDetailsRequest;
 import com.appdevelopers.app.ws.ui.models.response.UserRest;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("users")
@@ -35,14 +38,14 @@ public class UserControllers {
 
 	@PostMapping(produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE }, consumes  = {
 			MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
-	public ResponseEntity<UserRest> createUsers(@RequestBody UserDetailsRequest userDeatils) {
+	public ResponseEntity<UserRest> createUsers(@Valid @RequestBody UserDetailsRequest userDeatils) {
 		
 		UserRest data=new UserRest();
 		data.setFirstName(userDeatils.getFirstName());
 		data.setLastName(userDeatils.getLastName());
 		data.setEmail(userDeatils.getEmail());
 		
-		return new ResponseEntity<UserRest>(data, HttpStatus.OK);
+		return new ResponseEntity<UserRest>(data, HttpStatus.CREATED);
 	}
 
 	@PutMapping

@@ -1,10 +1,25 @@
 package com.appdevelopers.app.ws.ui.models.request;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
 public class UserDetailsRequest {
 
+	@NotNull(message = "Firstname cannot be null")
+	@Size(min = 2,message = "First Name cannot be less than 2 characters")
 	private String firstName;
+
+	@NotNull(message = "LastName cannot be null")
+	@Size(min = 2,message = "Last Name cannot be less than 2 characters")
 	private String lastName;
+	
+	@NotNull(message = "password cannot be null")
+	@Size(min = 8,max = 20)
 	private String password;
+	
+	@NotNull(message = "email cannot be null")
+	@Email
 	private String email;
 
 	public String getEmail() {
