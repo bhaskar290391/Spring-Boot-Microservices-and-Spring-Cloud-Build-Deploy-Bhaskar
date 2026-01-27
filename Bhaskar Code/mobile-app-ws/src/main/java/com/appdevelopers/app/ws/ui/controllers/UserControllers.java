@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.appdevelopers.app.ws.exception.UserServiceException;
 import com.appdevelopers.app.ws.ui.models.request.UpdateUserDetailsRequest;
 import com.appdevelopers.app.ws.ui.models.request.UserDetailsRequest;
 import com.appdevelopers.app.ws.ui.models.response.UserRest;
@@ -40,11 +41,13 @@ public class UserControllers {
 	@GetMapping(path = "/{userId}", produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
 	public ResponseEntity<UserRest> getUsersById(@PathVariable String userId) {
 
-		if (usersData.containsKey(userId)) {
-			return new ResponseEntity<UserRest>(usersData.get(userId), HttpStatus.OK);
-		} else {
-			return new ResponseEntity<UserRest>(HttpStatus.NO_CONTENT);
-		}
+		throw new UserServiceException("Custome Exception");
+		
+//		if (usersData.containsKey(userId)) {
+//			return new ResponseEntity<UserRest>(usersData.get(userId), HttpStatus.OK);
+//		} else {
+//			return new ResponseEntity<UserRest>(HttpStatus.NO_CONTENT);
+//		}
 	}
 
 	@PostMapping(produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE }, consumes = {
