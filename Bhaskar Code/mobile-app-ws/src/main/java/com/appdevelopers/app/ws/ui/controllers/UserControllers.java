@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.jspecify.annotations.Nullable;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.appdevelopers.app.ws.exception.UserServiceException;
+import com.appdevelopers.app.ws.service.UserService;
 import com.appdevelopers.app.ws.ui.models.request.UpdateUserDetailsRequest;
 import com.appdevelopers.app.ws.ui.models.request.UserDetailsRequest;
 import com.appdevelopers.app.ws.ui.models.response.UserRest;
@@ -31,6 +33,9 @@ public class UserControllers {
 
 	private Map<String, UserRest> usersData;
 
+	@Autowired
+	private UserService service;
+
 	@GetMapping
 	public String getUsers(@RequestParam(value = "page", required = false, defaultValue = "1") int page,
 			@RequestParam(value = "limit", required = false, defaultValue = "50") int limit,
@@ -41,33 +46,26 @@ public class UserControllers {
 	@GetMapping(path = "/{userId}", produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
 	public ResponseEntity<UserRest> getUsersById(@PathVariable String userId) {
 
-		throw new UserServiceException("Custome Exception");
-		
-//		if (usersData.containsKey(userId)) {
-//			return new ResponseEntity<UserRest>(usersData.get(userId), HttpStatus.OK);
-//		} else {
-//			return new ResponseEntity<UserRest>(HttpStatus.NO_CONTENT);
-//		}
+		// throw new UserServiceException("Custome Exception");
+
+		if (usersData.containsKey(userId)) {
+			return new ResponseEntity<UserRest>(usersData.get(userId), HttpStatus.OK);
+		} else {
+			return new ResponseEntity<UserRest>(HttpStatus.NO_CONTENT);
+		}
 	}
 
 	@PostMapping(produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE }, consumes = {
 			MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
 	public ResponseEntity<UserRest> createUsers(@Valid @RequestBody UserDetailsRequest userDeatils) {
 
-		UserRest data = new UserRest();
-		data.setFirstName(userDeatils.getFirstName());
-		data.setLastName(userDeatils.getLastName());
-		data.setEmail(userDeatils.getEmail());
-
-		String userId = UUID.randomUUID().toString();
-		data.setUserId(userId);
+		UserRest user = service.createUser(userDeatils);
 		if (usersData == null) {
 			usersData = new HashMap<>();
 		}
 
-		usersData.put(userId, data);
-
-		return new ResponseEntity<UserRest>(data, HttpStatus.CREATED);
+		usersData.put(user.getUserId(), user);
+		return new ResponseEntity<UserRest>(user, HttpStatus.CREATED);
 	}
 
 	@PutMapping(path = "/{userId}", produces = { MediaType.APPLICATION_JSON_VALUE,
@@ -88,7 +86,7 @@ public class UserControllers {
 
 	@DeleteMapping("/{userId}")
 	public ResponseEntity<Void> deleteUsers(@PathVariable String userId) {
-		
+
 		usersData.remove(userId);
 		return ResponseEntity.noContent().build();
 	}
