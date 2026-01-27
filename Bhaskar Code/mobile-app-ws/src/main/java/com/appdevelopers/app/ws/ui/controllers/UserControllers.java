@@ -1,9 +1,13 @@
 package com.appdevelopers.app.ws.ui.controllers;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
+import org.jspecify.annotations.Nullable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,6 +27,8 @@ import jakarta.validation.Valid;
 @RequestMapping("users")
 public class UserControllers {
 
+	Map<String, Object> usersData;
+
 	@GetMapping
 	public String getUsers(@RequestParam(value = "page", required = false, defaultValue = "1") int page,
 			@RequestParam(value = "limit", required = false, defaultValue = "50") int limit,
@@ -32,19 +38,31 @@ public class UserControllers {
 
 	@GetMapping(path = "/{userId}", produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
 	public ResponseEntity<UserRest> getUsersById(@PathVariable String userId) {
-		UserRest returnValue = new UserRest(userId, "Bhaskar", "Mudaliyar", "maddy@gmail.com");
-		return new ResponseEntity<UserRest>(returnValue, HttpStatus.ACCEPTED);
+		
+		if(usersData.containsKey(userId)) {
+			return new ResponseEntity<UserRest>((@Nullable UserRest) usersData.get(userId), HttpStatus.OK);
+		}else {
+			return new ResponseEntity<UserRest>(HttpStatus.NO_CONTENT);
+		}
 	}
 
-	@PostMapping(produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE }, consumes  = {
+	@PostMapping(produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE }, consumes = {
 			MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
 	public ResponseEntity<UserRest> createUsers(@Valid @RequestBody UserDetailsRequest userDeatils) {
-		
-		UserRest data=new UserRest();
+
+		UserRest data = new UserRest();
 		data.setFirstName(userDeatils.getFirstName());
 		data.setLastName(userDeatils.getLastName());
 		data.setEmail(userDeatils.getEmail());
-		
+
+		String userId = UUID.randomUUID().toString();
+		data.setUserId(userId);
+		if (usersData == null) {
+			usersData = new HashMap<>();
+		}
+
+		usersData.put(userId, data);
+
 		return new ResponseEntity<UserRest>(data, HttpStatus.CREATED);
 	}
 
