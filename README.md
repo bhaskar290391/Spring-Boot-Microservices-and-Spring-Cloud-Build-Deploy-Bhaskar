@@ -32,3 +32,12 @@ https://github.com/simplyi/SpringCloudVideoCourse/tree/section-30-secure-eureka-
 
 #Method Level Security
 https://github.com/simplyi/SpringCloudVideoCourse/tree/section-33-method-level-security-spring-boot-3  
+
+
+##########################################################################################################
+Running multiple instance of spring boot-3
+
+mvn spring-boot:run -Dspring-boot.run.arguments=--spring.application.instance-id=bhaskar
+
+mvn spring-boot:run -Dspring-boot.run.arguments=--spring.application.instance-id=bhaskar2,--server.port=1991
+
