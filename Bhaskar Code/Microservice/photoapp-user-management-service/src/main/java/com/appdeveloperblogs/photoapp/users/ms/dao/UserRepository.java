@@ -8,4 +8,6 @@ import com.appdeveloperblogs.photoapp.users.ms.Entity.UserEntity;
 @Repository
 public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
+	UserEntity findByEmail(String username);
+
 }

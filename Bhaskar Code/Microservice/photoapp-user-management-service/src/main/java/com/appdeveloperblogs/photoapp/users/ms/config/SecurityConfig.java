@@ -1,45 +1,57 @@
 package com.appdeveloperblogs.photoapp.users.ms.config;
 
-import java.net.InetAddress;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+
+import com.appdeveloperblogs.photoapp.users.ms.service.UserService;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-	
+
 	@Autowired
 	private Environment environment;
 
+	@Autowired
+	private UserService service;
+
+	@Autowired
+	private BCryptPasswordEncoder encoder;
+
+
+
 	@Bean
-	protected SecurityFilterChain configure(HttpSecurity http) throws Exception{
-		
-		System.out.println("===> "+ environment.getProperty("LOCAL_IP"));
-		InetAddress inetAddress = InetAddress.getLocalHost();
-        System.out.println("Local IP Address: " + inetAddress.getHostAddress());
-        System.out.println("Host Name: " + inetAddress.getHostName());
-        System.out.println("Gateway IP: " + environment.getProperty("gateway.ip"));
+	public SecurityFilterChain securityFilterChain(HttpSecurity http,AuthenticationManager authenticationManager) throws Exception {
 
+		AuthenticationManagerBuilder managerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
 
-		
-		http.csrf((cus)-> cus.disable());
-		http.authorizeHttpRequests((auth) -> auth.requestMatchers(new AntPathRequestMatcher("/users"))
-				.permitAll()
-				//.access(new WebExpressionAuthorizationManager("hasIpAddress('"+environment.getProperty("gateway.ip")+"')"))
-				.requestMatchers(new AntPathRequestMatcher("/h2-console/**")).permitAll())
-		.sessionManagement(sesssion-> sesssion.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-		
-		http.headers( header -> header.frameOptions(frame -> frame.sameOrigin()));
-				
-				
+		managerBuilder.userDetailsService(service).passwordEncoder(encoder);
+		http.csrf(csrf -> csrf.disable());
+
+		http.authorizeHttpRequests(auth -> auth.requestMatchers("/users").permitAll()
+				// .requestMatchers("/users").access(new
+				// WebExpressionAuthorizationManager("hasIpAddress('" +
+				// environment.getProperty("gateway.ip") + "')"))
+				.requestMatchers("/h2-console/**").permitAll());
+
+		http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+
+		http.headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()));
+
+		// Register your custom filter
+		http.addFilter(new AuthenticationFilters(service, environment, authenticationManager));
+
+		http.authenticationManager(authenticationManager);
+
 		return http.build();
 	}
 }

@@ -1,10 +1,14 @@
 package com.appdeveloperblogs.photoapp.users.ms.service;
 
+import java.util.ArrayList;
 import java.util.UUID;
 
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -38,6 +42,25 @@ public class UserServiceImpl implements UserService {
 		UserDTO returnValue = mapper.map(userEntity, UserDTO.class);
 
 		return returnValue;
+	}
+
+	@Override
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+
+		UserEntity data = repository.findByEmail(username);
+
+		if (data == null)
+			throw new UsernameNotFoundException(username);
+		return new User(data.getEmail(), data.getEncryptedPassword(), true, true, true, true, new ArrayList<>());
+	}
+
+	@Override
+	public UserDTO getUserDetailByEmail(String username) {
+		UserEntity data = repository.findByEmail(username);
+
+		if (data == null)
+			throw new UsernameNotFoundException(username);
+		return new ModelMapper().map(data, UserDTO.class);
 	}
 
 }
