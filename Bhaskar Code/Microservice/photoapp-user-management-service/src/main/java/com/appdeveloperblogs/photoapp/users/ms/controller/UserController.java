@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.appdeveloperblogs.photoapp.users.ms.model.CreateUserRequestModel;
+import com.appdeveloperblogs.photoapp.users.ms.service.UserService;
 
 import jakarta.validation.Valid;
 
@@ -18,6 +19,9 @@ public class UserController {
 
 	@Autowired
 	private Environment env;
+	
+	@Autowired
+	private UserService service;
 
 	@GetMapping("/status/check")
 	public String greet() {
