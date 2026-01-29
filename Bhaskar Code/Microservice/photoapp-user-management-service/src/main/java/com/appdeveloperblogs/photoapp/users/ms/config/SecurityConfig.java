@@ -45,10 +45,12 @@ public class SecurityConfig {
 
 		http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-		http.headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()));
+;		http.headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()));
 
 		// Register your custom filter
-		http.addFilter(new AuthenticationFilters(service, environment, authenticationManager));
+		AuthenticationFilters filter = new AuthenticationFilters(service, environment, authenticationManager);
+		filter.setFilterProcessesUrl(environment.getProperty("login.path.url"));
+		http.addFilter(filter);
 
 		http.authenticationManager(authenticationManager);
 
