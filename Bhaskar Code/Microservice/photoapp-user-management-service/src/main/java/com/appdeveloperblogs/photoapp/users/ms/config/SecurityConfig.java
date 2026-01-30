@@ -11,6 +11,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.intercept.AuthorizationFilter;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.appdeveloperblogs.photoapp.users.ms.service.UserService;
 
@@ -27,25 +29,25 @@ public class SecurityConfig {
 	@Autowired
 	private BCryptPasswordEncoder encoder;
 
-
-
 	@Bean
-	public SecurityFilterChain securityFilterChain(HttpSecurity http,AuthenticationManager authenticationManager) throws Exception {
+	public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager authenticationManager)
+			throws Exception {
 
 		AuthenticationManagerBuilder managerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
 
 		managerBuilder.userDetailsService(service).passwordEncoder(encoder);
 		http.csrf(csrf -> csrf.disable());
 
-		http.authorizeHttpRequests(auth -> auth.requestMatchers("/users").permitAll()
-				// .requestMatchers("/users").access(new
-				// WebExpressionAuthorizationManager("hasIpAddress('" +
-				// environment.getProperty("gateway.ip") + "')"))
-				.requestMatchers("/h2-console/**").permitAll());
+		http.authorizeHttpRequests(auth -> auth.requestMatchers("/users/**").access(
+				new IpBasedAuthorizationManager(environment))  
+				.requestMatchers("/users/status/check").access(
+						new IpBasedAuthorizationManager(environment))
+				.requestMatchers("/h2-console/**").permitAll()
+				.anyRequest().authenticated());
 
 		http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-;		http.headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()));
+		http.headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()));
 
 		// Register your custom filter
 		AuthenticationFilters filter = new AuthenticationFilters(service, environment, authenticationManager);
