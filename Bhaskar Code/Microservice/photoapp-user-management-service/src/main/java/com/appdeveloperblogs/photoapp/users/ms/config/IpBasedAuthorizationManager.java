@@ -25,15 +25,15 @@ public class IpBasedAuthorizationManager implements AuthorizationManager<Request
         String clientIp = null;
         if (clientIp == null || clientIp.isEmpty()) {
             clientIp = request.getRemoteAddr();
-        } 
+        }
 
         String allowedIp = environment.getProperty("gateway.ip");
-        
+
         System.out.println("Client IP: " + clientIp);
         System.out.println("Allowed IP: " + allowedIp);
         System.out.println("X-Forwarded-For: " + request.getHeader("X-Forwarded-For"));
         System.out.println("Remote Addr: " + request.getRemoteAddr());
-        
+
         boolean allowed = clientIp.equals(allowedIp);
         System.out.println("Authorization allowed: " + allowed);
 
